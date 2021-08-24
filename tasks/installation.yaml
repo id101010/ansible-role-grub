@@ -1,0 +1,6 @@
+---
+
+- name: install grub related packages
+  package:
+    name: '{{ grub_packages }}'
+    state: present

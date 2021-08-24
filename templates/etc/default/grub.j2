@@ -1,0 +1,35 @@
+{% if grub_consoles | d(False) %}
+{%   set grub_console = "console=" + grub_consoles | join(' console=') %}
+{% endif %}
+{% if grub_cmdline_linux_default_list | d(False) %}
+{%   set grub_cmdline_linux_default = grub_cmdline_linux_default_list | join(' ') %}
+{% endif %}
+{% set grub_cmdline_linux = [] + grub_cmdline_linux_list %}
+{% if ansible_cmdline['rd.auto'] | d(False) %}
+{%   set grub_cmdline_linux = grub_cmdline_linux + ['rd.auto'] %}
+{% endif %}
+{% if grub_disable_network_predictable_interface_names %}
+{%   set grub_cmdline_linux = grub_cmdline_linux + ['net.ifnames=0'] %}
+{% endif %}
+
+# default entry
+GRUB_DEFAULT=saved
+# grub timeout
+GRUB_TIMEOUT={{ grub_timeout }}
+# distribition information
+GRUB_DISTRIBUTOR=$(sed 's, release .*$,,g' /etc/system-release)
+
+{% if grub_console and grub_cmdline_linux_default | d(False) %}
+GRUB_CMDLINE_LINUX_DEFAULT="{{ grub_console }} {{ grub_cmdline_linux_default }}"
+{% elif grub_cmdline_linux_default | d(False) %}
+GRUB_CMDLINE_LINUX_DEFAULT="{{ grub_cmdline_linux_default }}"
+{% else %}
+GRUB_CMDLINE_LINUX_DEFAULT="{{ grub_console }}"
+{% endif %}
+GRUB_CMDLINE_LINUX="{{ grub_cmdline_linux | join(' ') }}"
+{% if grub_serial | d(False) %}
+GRUB_SERIAL_COMMAND="serial --speed={{ grub_serial.speed }} --unit={{ grub_serial.unit }} --word={{ grub_serial.word }} --parity={{ grub_serial.parity }} --stop={{ grub_serial.stop }}"
+{% endif %}
+
+# disable graphical terminal
+GRUB_TERMINAL=console

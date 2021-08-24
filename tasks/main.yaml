@@ -1,0 +1,20 @@
+---
+# tasks file for ansible-role-grub
+
+- name: load variables based on distribution type
+  include_vars: '{{ item }}'
+  with_first_found:
+    - '{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yaml'
+    - '{{ ansible_os_family }}.yaml'
+  tags:
+    - 'grub_vars'
+
+- name: import installation tasks
+  import_tasks: installation.yaml
+  tags:
+    - 'grub_install'
+
+- name: import configuration tasks
+  import_tasks: configuration.yaml
+  tags:
+    - 'grub_configuration'
